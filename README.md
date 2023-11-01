@@ -1,2 +1,2 @@
 # FitQuest
- Fun App For Tracking Goals, Health Focused
+ Fun Health Focused App For Tracking Goals
