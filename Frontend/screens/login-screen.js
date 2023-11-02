@@ -1,53 +1,111 @@
 import { Text, View, StyleSheet, TextInput, TouchableOpacity } from "react-native"
 import { useNavigation } from "@react-navigation/native"
+import { useState } from "react"
+import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 
-export const LogInScreen = () => {
-  const navigation = useNavigation()
+export const LogInScreen = ({ navigation}) => {
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword)
+  }
   return(
-    <View style={styles.screen}>
+    <View style={styles.screenContainer}>
+       <Text style={{fontWeight: 'bold', fontSize: 48, color: '#E7EBE3', marginBottom: 40}}>LOG IN</Text>
        <View style= {styles.textInputContainer}>
         <Text style={styles.text}>Email</Text>
         <TextInput placeholder="email" style={styles.textInput}></TextInput>
        </View>
       <View style= {styles.textInputContainer}>
-        <Text style={styles.text}>Password</Text>
-        <TextInput placeholder="password" style={styles.textInput}></TextInput>
+        <Text style={styles.text} >Password:</Text>
+        <TextInput 
+            placeholder="Enter password" 
+            style={styles.textInput}
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}/>
+
+            <MaterialCommunityIcons 
+            name={showPassword ? 'eye-off' : 'eye'} 
+            size={24} 
+            color="#E7EBE3"
+            style={styles.icon} 
+            onPress={toggleShowPassword} 
+            />
       </View>
-      <View style={{alignContent: 'center'}}>
-        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('HomeScreen')}>
-          <Text style={styles.text}>Log In</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CentralStack')}>
+        <Text style={styles.text}>Log In</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
+  screenContainer: {
     flex: 1,
-    padding: 10,
-    backgroundColor: '#F5F5F5',
-    justifyContent: 'center'
+    backgroundColor: '#E08952',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: 30
   },
   textInputContainer: {
-    margin: 5
+    margin: 10,
+    padding: 10,
+    flexDirection: 'row',
+    backgroundColor: '#1F2740',
+    width: "90%",
+    height: "10%",
+    borderRadius: 15,
+    alignItems: 'center',
   },
   textInput: {
-    backgroundColor: 'white',
-    padding: 20
+    flex: 1,
+    color: '#E7EBE3',
+    padding: 5,
+    marginLeft: 10,
+    borderRadius: 15,
+    width: "80%",
+    fontSize: 18
+  },
+  button: {
+    backgroundColor: '#4A9493',
+    width: "90%",
+    height: "10%",
+    marginTop: 300,
+    borderRadius: 15,
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row'
   },
   text: {
-    fontSize: 30,
+    fontSize: 24,
     textAlign: 'center',
-    color: '#333333'
+    color: '#E7EBE3'
   },
-  btn: {
-    backgroundColor: '#007AFF',
-    height: '25%',
-    marginTop: 10,
+  centeredView: {
+    flex: 1,
     justifyContent: 'center',
-    borderRadius: 20
-  }
+    alignItems: 'center',
+    marginTop: 22
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    width: "90%",
+    padding: 35,
+    alignItems: 'center', 
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
 })
-
 export default LogInScreen;

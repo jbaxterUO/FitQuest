@@ -1,0 +1,20 @@
+
+# Will need this when I get to the profile edit screen
+      <Modal
+      animationType="datepicker"
+      transparent={true}
+      visible={DOBopen}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+          <DatePicker
+          mode='date'
+          selected={date} 
+          onDateChange={handleDateChange}
+          />
+          <TouchableOpacity onPress={handleOnPress}>
+            <Text>Done</Text>
+          </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
