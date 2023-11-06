@@ -1,21 +1,53 @@
-import { Text, View, StyleSheet, TextInput, TouchableOpacity } from "react-native"
+import { Text, View, StyleSheet, TextInput, TouchableOpacity, Button } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { useState } from "react"
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 
+
 export const LogInScreen = ({ navigation}) => {
   const [password, setPassword] = useState('')
+  const[email, setEmail] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const[warning, setWarning] = useState('')
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword)
   }
+
+  const incorrectAttempt = () =>{
+    setEmail('');
+    setPassword(''); 
+    setWarning('Incorrect Username or Password');
+  }
+  const verifyLogin = async (email, password) =>{
+    try {
+      const response = await fetch(
+        'http://192.168.1.9:5000/api/login', 
+        {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          })});
+      const json = await response.json()
+      return json
+
+    } catch (error){
+      console.error(error);
+      return false
+    }
+  }
+
   return(
     <View style={styles.screenContainer}>
        <Text style={{fontWeight: 'bold', fontSize: 48, color: '#E7EBE3', marginBottom: 40}}>LOG IN</Text>
+       <Text style={{fontWeight: 'bold', fontSize: 24, color: 'red', marginBottom: 5}}>{warning}</Text>
        <View style= {styles.textInputContainer}>
-        <Text style={styles.text}>Email</Text>
-        <TextInput placeholder="email" style={styles.textInput}></TextInput>
+        <Text style={styles.text}>Email:</Text>
+        <TextInput placeholder="Enter email" style={styles.textInput} value={email} onChangeText={setEmail}></TextInput>
        </View>
       <View style= {styles.textInputContainer}>
         <Text style={styles.text} >Password:</Text>
@@ -34,7 +66,19 @@ export const LogInScreen = ({ navigation}) => {
             onPress={toggleShowPassword} 
             />
       </View>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CentralStack')}>
+      <Button title="Don't have an account? Click Here" onPress={() => navigation.navigate('SignUpScreen')}/>
+      <TouchableOpacity 
+      style={styles.button} 
+      onPress={async () => 
+        {
+        const login_verification = await verifyLogin(email, password);
+        if (login_verification.response === 'true') {
+          const ID = login_verification.id;
+          navigation.navigate('CentralStack', {
+            screen: 'HomeScreen',
+            params: {'userID': ID}
+          })}
+        else{incorrectAttempt();}}}>
         <Text style={styles.text}>Log In</Text>
       </TouchableOpacity>
     </View>
@@ -73,7 +117,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#4A9493',
     width: "90%",
     height: "10%",
-    marginTop: 300,
+    marginTop: 275,
     borderRadius: 15,
     padding: 10,
     justifyContent: 'center',
