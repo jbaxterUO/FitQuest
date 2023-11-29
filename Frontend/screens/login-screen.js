@@ -2,7 +2,7 @@ import { Text, View, StyleSheet, TextInput, TouchableOpacity, Button } from "rea
 import { useNavigation } from "@react-navigation/native"
 import { useState } from "react"
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const LogInScreen = ({ navigation}) => {
   const [password, setPassword] = useState('')
@@ -19,6 +19,7 @@ export const LogInScreen = ({ navigation}) => {
     setPassword(''); 
     setWarning('Incorrect Username or Password');
   }
+
   const verifyLogin = async (email, password) =>{
     try {
       const response = await fetch(
@@ -39,6 +40,15 @@ export const LogInScreen = ({ navigation}) => {
       console.error(error);
       return false
     }
+  }
+
+  const storeAccessToken = async (token) => {
+    try{
+    await AsyncStorage.setItem('userToken', token)
+    console.log('Token stored successfully');
+  } catch(error) {
+    console.error('Error storing token:', error);
+  }
   }
 
   return(
@@ -74,9 +84,10 @@ export const LogInScreen = ({ navigation}) => {
         const login_verification = await verifyLogin(email, password);
         if (login_verification.response === 'true') {
           const ID = login_verification.id;
+          storeAccessToken(login_verification.access_token)
           navigation.navigate('CentralStack', {
             screen: 'HomeScreen',
-            params: {'userID': ID}
+            params: {'userID': ID},
           })}
         else{incorrectAttempt();}}}>
         <Text style={styles.text}>Log In</Text>

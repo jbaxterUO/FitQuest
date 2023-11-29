@@ -1,22 +1,46 @@
-import { Text, View, StyleSheet, TouchableOpacity, ImageBackground } from "react-native"
+import React, { useEffect } from 'react';
+import { View, Text, TouchableOpacity, ImageBackground, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function LoadUpScreen ({ navigation }){
-  const handleNavigateToLoginScreen = () =>{
-    navigation.navigate("LogInScreen")
-  }
+function LoadUpScreen({ navigation }) {
+  const ID = 0;
 
-  const handleNavigateToSignUpScreen = () =>{
-    navigation.navigate("SignUpScreen")
-  }
+  const retrieveToken = async () => {
+    try {
+      const tokenValue = await AsyncStorage.getItem('userToken');
+      return tokenValue;
+    } catch (err) {
+      console.error('Error retrieving token:', err);
+      return null;
+    }
+  };
 
-  return(
+  useEffect(() => {
+    const fetchData = async () => {
+      const retrievedValue = await retrieveToken();
+      if (retrievedValue !== null) {
+        navigation.navigate('CentralStack', {
+          screen: 'HomeScreen',
+          params: { userID: ID },
+        });
+      }
+    };
+
+    fetchData();
+  }, [navigation]);
+
+  return (
     <View style={styles.container}>
-      <ImageBackground source={require('../assets/SignUpBackGround.jpg')} style={styles.image} resizeMode="cover">
+      <ImageBackground
+        source={require('../assets/SignUpBackGround.jpg')}
+        style={styles.image}
+        resizeMode="cover"
+      >
         <View style={styles.screen}>
-          <TouchableOpacity onPress={handleNavigateToSignUpScreen}>
+          <TouchableOpacity onPress={() => navigation.navigate('SignUpScreen')}>
             <Text style={styles.text}>Sign Up</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleNavigateToLoginScreen}>
+          <TouchableOpacity onPress={() => navigation.navigate('LogInScreen')}>
             <Text style={styles.text}>Log in</Text>
           </TouchableOpacity>
         </View>

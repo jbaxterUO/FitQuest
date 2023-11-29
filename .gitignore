@@ -29,10 +29,11 @@ yarn-error.*
 *.pem
 
 # local env files
-.env*.local .ini
+.env*.local /Backend/settings.ini
 
 # typescript
 *.tsbuildinfo
 
 #local cache files
 __pycache__
+

@@ -2,7 +2,6 @@ import {ScrollView, StyleSheet, Text} from 'react-native';
 
 export default function MealEntry() {
   return (
-    
         <Text style={styles.text}>
           Here is my block of text!
         </Text>
@@ -11,7 +10,6 @@ export default function MealEntry() {
 
 
 const styles = StyleSheet.create({
-
   text: {
     color: 'white',
   }
