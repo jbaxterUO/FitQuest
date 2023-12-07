@@ -1,15 +1,15 @@
 import { View, Text, StyleSheet, Button } from 'react-native'
 import React, { useState, useEffect } from 'react'
-import FoodList from './../components/food-list';
+import FoodList from '../components/food-list';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import useFoodStore from "../stores/food-entries-store";
 
-
-export const AddFoodScreen = () => {
+export const ViewDailyFoods = ({ navigation }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [dateIndex, setDateIndex] = useState(1)
-  const [weeklyFood, setWeeklyFood] = useState()
-  const [page, setPage] = useState(0) 
+  const [page, setPage] = useState(0)
+  const { dailyFood, setDailyFoodItems, removeDailyFooditems } = useFoodStore();
   
   const fetchFoodItems = async (page) => {
     try{
@@ -29,13 +29,6 @@ export const AddFoodScreen = () => {
       console.error(e);
   }}
 
-  useEffect( () => {
-      async function initialFetch(){
-        const initial_week = await fetchFoodItems(page);
-        setWeeklyFood(initial_week);
-      }
-      initialFetch()
-    }, []);
 
   const incrementDate = () => {
     const newDate = new Date(currentDate);
@@ -53,7 +46,7 @@ export const AddFoodScreen = () => {
     //Plus 1 before modulo to request data one before scroll for smoother loading
     if((dateIndex + 1) % 7 === 0){
       // A bit of an expensive operation but it keeps the data fetching in check, also there should never be more than ~60 items in memory at once for this so it should be okay
-      const keysArray = Object.keys(weeklyFood).map(Number);
+      const keysArray = Object.keys(dailyFood).map(Number);
       const maxKeyValue = Math.max(... keysArray)
 
       // Plus 2 because we want to see if the next value would need to be loaded and we are already in here on the dateIndex + 1 so, 1 past that
@@ -66,11 +59,13 @@ export const AddFoodScreen = () => {
 
   const handleNewPage = async () => {
     const next_page = await fetchFoodItems(page + 1);
-    setWeeklyFood({...weeklyFood, ...next_page});
+    Object.keys(next_page).forEach(key =>{
+      setDailyFoodItems(key, next_page[key])
+    })
   }
 
   const handleAddFood = () => {
-    console.log("BIG MAD")
+    navigation.navigate('AddFood');
   }
 
   return (
@@ -84,14 +79,14 @@ export const AddFoodScreen = () => {
           <Text style={styles.button}>Next</Text>
         </TouchableOpacity>
       </View>
-      {weeklyFood && (<FoodList foodItems={weeklyFood[dateIndex]}/>)}
+      {dailyFood && (<FoodList foodItems={dailyFood[dateIndex]}/>)}
       
       <Button title="Add Food" onPress={handleAddFood} />
     </SafeAreaView>
   );
 }
 
-export default AddFoodScreen;
+export default ViewDailyFoods;
 
 const styles = StyleSheet.create({
   screenContainer: {

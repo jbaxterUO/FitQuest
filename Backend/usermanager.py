@@ -3,7 +3,6 @@ import uuid
 import bcrypt
 import datetime
 
-
 class UserManager():
     """
     A class responsible for user management and authentication.
@@ -50,11 +49,6 @@ class UserManager():
         Returns:
             bool: True if the password and password salt were successfully updated, False otherwise.
 
-        This method takes a dictionary of user data as input and updates the "password" and "password_salt"
-        values in the dictionary with new hashed values. The updated values are obtained by calling the
-        `hash_password` method, which returns a tuple of bytes-like objects representing the hashed
-        password and password salt. This method then decodes these byte-like objects to UTF-8 strings
-        and updates the data dictionary.
 
         If the password hashing process is successful, the method returns True. If an exception is raised
         during the process, it returns False, indicating that the update was not successful.
@@ -79,14 +73,14 @@ class UserManager():
             bool: True if the password is correct; False otherwise.
         """
 
-        stored_info = self.database.select_from_db('users', {'fields': [
+        stored_info = self.database.read_from_db('users', {'fields': [
             'password', 'password_salt', 'userID'], 'formatting': f'WHERE email= "{email}"'})
 
         rehashed_password = bcrypt.hashpw(
-            password.encode('utf-8'), stored_info[0][1].encode('utf-8'))
+            password.encode('utf-8'), stored_info[0]['password_salt'].encode('utf-8'))
         
 
-        return rehashed_password.decode("utf-8") == stored_info[0][0], stored_info[0][2]
+        return rehashed_password.decode("utf-8") == stored_info[0]['password'], stored_info[0]['userID']
 
     def check_email(self, email: str) -> bool:
         """
@@ -98,8 +92,7 @@ class UserManager():
         Returns:
             bool: True if the email exists in the database; False otherwise.
         """
-        print(email)
-        query_result = self.database.select_from_db('users', {'fields': [
+        query_result = self.database.read_from_db('users', {'fields': [
             'email'], 'formatting': f'WHERE email = "{email}"'})
         return True if query_result else False
 

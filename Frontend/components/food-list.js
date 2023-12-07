@@ -1,28 +1,19 @@
 // FoodList.js
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, Modal, TextInput, StyleSheet, FlatList } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, StyleSheet, FlatList } from 'react-native';
 import Food from './food-item';
 
 
 const FoodList = ({ foodItems }) => {
-  const [foods, setFoods] = useState([]);
 
-  useEffect(()=> {
-  const fetchDaysFood = () => {
-    setFoods(foodItems);
-    }
-    fetchDaysFood();
-   }, [foodItems]);
-
-  if(foods){
+  if(foodItems){
   return (
     
     <View style={styles.listContainer}>
       <FlatList
-        data={foods}
-        renderItem={({ item }) => <Food {...item} />}
+        data={foodItems}
         keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item, index }) => <Food {...item}/>}
         style={styles.flatList}
       />
     </View>
@@ -44,11 +35,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#2a2b31'
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
   },
   input: {
     height: 40,

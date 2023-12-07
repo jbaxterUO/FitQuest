@@ -1,22 +1,26 @@
 import { Text, View, StyleSheet, ScrollView, Button } from "react-native"
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native"
 import MacroGraphCardComponent from "../components/macro-graph-card";
-import { useState, useEffect } from "react";
+import { useState, useEffect} from "react";
 import PieChartComponent from "../components/piechart";
 import { SafeAreaView } from "react-native-safe-area-context";
-import FoodList from "../components/food-list";
+import useFoodStore from "../stores/food-entries-store";
+
 
 export const HomeScreen = ({ route, navigation }) => {
-  const { userID } = route.params
-  const [chartData, setChartData] = useState()
+  const { userID } = route.params;
+  const [chartData, setChartData] = useState();
+  const { dailyFood, fetchDailyFood, setDailyFoodItems, removeDailyFooditems } = useFoodStore();
+
   useEffect(() => {
     // Fetch data from the database
-    onLaunch = () =>{
+    onLaunch = () => {
       setChartData([150, 100, 200]);
+      fetchDailyFood(0, 'http://192.168.1.9:5000/api/getdaily')
     }
-      onLaunch();
-    }, []);
+    onLaunch();
+    },[]);
 
     if(chartData){
       return(
@@ -35,6 +39,7 @@ export const HomeScreen = ({ route, navigation }) => {
             </MacroGraphCardComponent>
           </View>
         </SafeAreaView>
+
 
       );
     }

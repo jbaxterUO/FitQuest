@@ -1,25 +1,38 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
-const Food = ({ name, nutrition, servingAmount, servingType }) => (
-  <View style={styles.foodContainer}>
-    <View style={styles.foodTitleContainer}>
-      <Text style={styles.foodTitle}>{name}</Text>
-    </View>
-  
-    <View style={styles.foodBodyContainer}>
-      <View>
-        <Text style={styles.foodText}>Carbs: {nutrition.carbs ? nutrition.carbs : ''}</Text>
-        <Text style={styles.foodText}>Protien: {nutrition.protien ? nutrition.protien : ''}</Text>
-        <Text style={styles.foodText}>Fat: {nutrition.fat ? nutrition.fat : ''}</Text>
+const Food = ({ name, nutrition, servingAmount, servingType }) => {
+  const hasNutritionData = nutrition && Object.keys(nutrition).length > 0;
+  return(
+    <TouchableOpacity onPress={() => alert(`Clicked on: ${nutrition?.carbs || 'No Data'}`)}>
+      <View style={styles.foodContainer}>
+        <View style={styles.foodTitleContainer}>
+          <Text style={styles.foodTitle}>{name}</Text>
+        </View>
+        <View style={styles.foodBodyContainer}>
+          {hasNutritionData ? (
+            <View>
+              <Text style={styles.foodText}>Carbs: {nutrition.carbs}</Text>
+              <Text style={styles.foodText}>Protein: {nutrition.protien}</Text>
+              <Text style={styles.foodText}>Fat: {nutrition.fat}</Text>
+            </View>
+          ) : (
+            <Text style={styles.foodText}>No Data</Text>
+          )}
+          <View>
+            {hasNutritionData && (
+              <>
+                <Text style={styles.foodText}>Calories: {nutrition.calories}</Text>
+                <Text style={styles.foodText}>{servingType}: {servingAmount}</Text>
+              </>
+            )}
+          </View>
+        </View>
       </View>
-      <View>
-        <Text style={styles.foodText}>Calories: {nutrition.calories ? nutrition.calories : ''}</Text>
-        <Text style={styles.foodText}>{servingType}: {servingAmount ? servingAmount : ''}</Text>
-      </View>
-    </View>
-  </View>
-);
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   foodContainer: {

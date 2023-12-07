@@ -1,10 +1,12 @@
 import {HomeScreen} from '../screens/home-screen';
 import { StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { AddFoodScreen } from './../screens/add-food-screen';
+import ViewDailyFoods from '../screens/view-daily-foods';
 import { Octicons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import LogOutButton from '../components/logout-button';
+import AddFood from '../screens/add-food';
+import AddFoodBackButton from '../components/add-food-back-button';
 
 const Tab = createBottomTabNavigator()
 
@@ -28,8 +30,8 @@ export const CentralStack = () => {
                 headerTitleStyle: {fontSize: 32, fontWeight: 'bold', fontFamily: 'Menlo'}}}
       />
       <Tab.Screen
-      name="AddFood"
-      component={AddFoodScreen}
+      name="ViewDailyFoods"
+      component={ViewDailyFoods}
       options={{
         title: 'FitQuest',
         tabBarIcon: ({focused}) => {return <FontAwesome5 name="journal-whills" size={24} color="black" />},
@@ -38,6 +40,21 @@ export const CentralStack = () => {
         headerStyle: {backgroundColor: '#33415c',}, 
         headerTintColor: '#E7EBE3', 
         headerTitleStyle: {fontSize: 32, fontWeight: 'bold', fontFamily: 'Menlo'}}}
+      />
+
+<Tab.Screen
+      name="AddFood"
+      component={AddFood}
+      options={{
+        title: 'FitQuest',
+        tabBarIcon: ({focused}) => {return <FontAwesome5 name="plus" size={24} color="black" />},
+        tabBarActiveTintColor: 'white',
+        tabBarLabel: 'AddFood',
+        headerStyle: {backgroundColor: '#33415c',}, 
+        headerTintColor: '#E7EBE3', 
+        headerTitleStyle: {fontSize: 32, fontWeight: 'bold', fontFamily: 'Menlo'}}}
+        //make the header have a back button
+        headerLeft={({ navigation }) => <AddFoodBackButton navigation={navigation} />}
       />
     </Tab.Navigator>
   );

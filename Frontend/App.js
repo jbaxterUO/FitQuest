@@ -7,6 +7,7 @@ import LogInScreen from './screens/login-screen';
 import 'react-native-gesture-handler';
 import { SignUpScreen } from './screens/sign-up-screen';
 import ProfileScreen from './screens/profile-screen';
+import NutritionDetails from './screens/nutrition-details';
 
 const RootStack = createStackNavigator();
 
@@ -33,7 +34,12 @@ function App() {
         component={CentralStack} 
         options={{headerShown: false, headerLeft: () => null,}}
         />
-        
+
+        <RootStack.Screen
+        name="NutritionDetails"
+        component={NutritionDetails}
+        />
+
       </RootStack.Navigator>
       <StatusBar style="auto"/>
     </NavigationContainer>

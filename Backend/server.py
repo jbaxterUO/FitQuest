@@ -1,12 +1,19 @@
 from flask import Flask
-from flask import request, url_for, redirect, Blueprint, flash, jsonify, make_response
+from flask import request, jsonify
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from database import DataBase
 from usermanager import UserManager
+from decouple import config
+from datetime import timedelta
+import random
+import json
+
 
 # will eventually help connect the different pages
-bp = Blueprint('auth', __name__, url_prefix='/auth')
 app = Flask(__name__)
+app.config['JWT_SECRET_KEY'] = config('JWT_KEY')
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=30)
+jwt = JWTManager(app)
 database = DataBase()
 usermanager = UserManager(database)
 
@@ -16,8 +23,9 @@ usermanager = UserManager(database)
 def login():
     data = request.get_json()
     status, id = usermanager.check_password(data['password'], data['email'])
+    access_token = create_access_token(identity=id)
     if status:
-        return jsonify({'response': 'true', 'id': id})
+        return jsonify({'response': 'true', 'id': id, 'access_token': access_token})
     else:
         return jsonify({"response": 'false'})
 
@@ -26,7 +34,6 @@ def login():
 @app.route('/api/newaccount', methods=['POST'])
 def create_account():
     data = request.get_json()
-    print(data)
     # Check if the email or password is missing
     if not data['email'] or not data['password']:
         return jsonify({"response": "false", "message": "Please fill in all fields"}), 400
@@ -45,6 +52,58 @@ def create_account():
     else:
         return jsonify({"response": "false", "message": "There was an error creating the account, please try again."}), 400
 
+
+@app.route('/api/getdaily', methods=['POST'])
+def get_food():
+    data = request.get_json()
+    pageNumber = data['pageNumber']
+    lowerBound = (pageNumber * 7) + 1
+    upperBound = (pageNumber * 7) + 7
+    test = {}
+
+    foodItems = [{'name': 'Ramen', 'nutrition': {'calories': 380, 'carbs': 53, 'protien': 9, 'fat': 14}, 'servingAmount': 1, 'servingType': 'Package'},
+    {'name': 'Sugar Free Rockstar', 'nutrition': {'calories': 25, 'carbs': 0, 'protien': 0, 'fat': 0}, 'servingAmount': 1, 'servingType': 'Can'},
+    {'name': 'Ghirardelli Chocolate Squares: Holiday', 'nutrition': {'calories': 130, 'carbs': 17, 'protien': 1, 'fat': 8}, 'servingAmount': 2, 'servingType': 'Squares'},
+    {'name': 'Mega Bowls: Country Fried Chicken', 'nutrition': {'calories': 440, 'carbs': 45, 'protien': 18, 'fat': 20}, 'servingAmount': 1, 'servingType': 'Container'}]
+
+    for i in range(lowerBound, upperBound + 1):
+        test[i] = []
+        for j in range(random.randint(1, 4)):
+            test[i].append(foodItems[random.randint(0, 3)])
+
+    return jsonify(test), 200
+
+@app.route('/api/getbarcode/<barcode>', methods=['GET'])
+def get_barcode(barcode):
+    print(barcode)
+    info = database.get_nutrion_from_barcode(barcode)
+    json_str = json.dumps(info, indent=4)
+    print(json_str)
+    return jsonify(info), 200
+
+# Route to handle the addition of a new food item
+@app.route('/api/addfood', methods=['POST'])
+def add_food():
+    data = request.get_json()
+    # Check if the food item already exists
+    if database.check_food(data['name']):
+        return jsonify({"response": "false", "message": "This food item already exists"}), 400
+
+    # Add the new food item
+    new_food = database.add_food(data)
+
+    if new_food:
+        return jsonify({"response": "true", "message": "Food item added successfully"}), 200
+    else:
+        return jsonify({"response": "false", "message": "There was an error adding the food item, please try again."}), 400
+
+@app.route('/api/getSearch/<food_title>', methods=['GET'])
+def get_search(food_title):
+    food_title.replace("%20", " ")
+    info = database.get_nutrition_from_name(food_title)
+    json_str = json.dumps(info, indent=4)
+    print(json_str)
+    return jsonify(info), 200
 
 
 if __name__ == '__main__':
