@@ -61,10 +61,10 @@ def get_food():
     upperBound = (pageNumber * 7) + 7
     test = {}
 
-    foodItems = [{'name': 'Ramen', 'nutrition': {'calories': 380, 'carbs': 53, 'protien': 9, 'fat': 14}, 'servingAmount': 1, 'servingType': 'Package'},
-    {'name': 'Sugar Free Rockstar', 'nutrition': {'calories': 25, 'carbs': 0, 'protien': 0, 'fat': 0}, 'servingAmount': 1, 'servingType': 'Can'},
-    {'name': 'Ghirardelli Chocolate Squares: Holiday', 'nutrition': {'calories': 130, 'carbs': 17, 'protien': 1, 'fat': 8}, 'servingAmount': 2, 'servingType': 'Squares'},
-    {'name': 'Mega Bowls: Country Fried Chicken', 'nutrition': {'calories': 440, 'carbs': 45, 'protien': 18, 'fat': 20}, 'servingAmount': 1, 'servingType': 'Container'}]
+    foodItems = [{'name': 'Ramen', 'nutrients': {'calories': 380, 'carbohydrates': 53, 'protein': 9, 'fat': 14}, "ingredients": "Enriched Flour (Wheat Flour, Niacin, Reduced Iron, Thiamine Mononitrate, Riboflavin, Folic Acid), Palm Oil, Salt, Contains Less than 2% of Autolyzed Yeast Extract, Calcium Silicate, Citric Acid, Disodium Guanylate, Disodium Inosinate, Dried Leek Flake, Garlic Powder, Hydrolyzed Corn Protein, Hydrolyzed Soy Protein, Maltodextrin, Monosodium Glutamate, Natural and Artificial Flavor, Onion Powder, Potassium Carbonate, Powdered Chicken, Rendered Chicken Fat, Sodium Alginate, Sodium Carbonate, Sodium Tripolyphosphate, Soybean, Spice and Color, Sugar, TBHQ (Preservative), Wheat.", 'servingAmount': 1, 'servingType': 'Package'},
+    {'name': 'Sugar Free Rockstar', 'nutrients': {'calories': 25, 'carbohydrates': 0, 'protein': 0, 'fat': 0}, 'servingAmount': 1, 'servingType': 'Can'},
+    {'name': 'Ghirardelli Chocolate Squares: Holiday', 'nutrients': {'calories': 130, 'carbohydrates': 17, 'protein': 1, 'fat': 8}, 'servingAmount': 2, 'servingType': 'Squares'},
+    {'name': 'Mega Bowls: Country Fried Chicken', 'nutrients': {'calories': 440, 'carbohydrates': 45, 'protein': 18, 'fat': 20}, 'servingAmount': 1, 'servingType': 'Container'}]
 
     for i in range(lowerBound, upperBound + 1):
         test[i] = []
@@ -99,7 +99,6 @@ def add_food():
 
 @app.route('/api/getSearch/<food_title>', methods=['GET'])
 def get_search(food_title):
-    food_title.replace("%20", " ")
     info = database.get_nutrition_from_name(food_title)
     json_str = json.dumps(info, indent=4)
     print(json_str)

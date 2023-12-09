@@ -6,36 +6,40 @@ import { useState, useEffect} from "react";
 import PieChartComponent from "../components/piechart";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useFoodStore from "../stores/food-entries-store";
+import ProgressBarComponent from "../components/progress-bar";
 
 
 export const HomeScreen = ({ route, navigation }) => {
   const { userID } = route.params;
   const [chartData, setChartData] = useState();
-  const { dailyFood, fetchDailyFood, setDailyFoodItems, removeDailyFooditems } = useFoodStore();
+  const { dailyFood, dailyMacros, fetchDailyFood } = useFoodStore();
 
   useEffect(() => {
     // Fetch data from the database
-    onLaunch = () => {
+    const onLaunch = async () => {
       setChartData([150, 100, 200]);
       fetchDailyFood(0, 'http://192.168.1.9:5000/api/getdaily')
-    }
+      .catch((error) => {
+        console.error(error);
+      });
+    };
     onLaunch();
-    },[]);
+  }, []);
 
     if(chartData){
       return(
         <SafeAreaView style={styles.screenContainer}>
           <View style={styles.cardsContainer}>
-            <MacroGraphCardComponent>
-              <PieChartComponent data={chartData}/>
+           <MacroGraphCardComponent>
               <Text style={styles.cardText}>Macros</Text>
+              <PieChartComponent/>
             </MacroGraphCardComponent>
           </View>
-
+            
           <View style={styles.cardsContainer}>
             <MacroGraphCardComponent>
-                <PieChartComponent data={chartData}/>
-                <Text style={styles.cardText}>Quests</Text>
+              <Text style={styles.cardText}>Goals</Text>
+              <ProgressBarComponent/>
             </MacroGraphCardComponent>
           </View>
         </SafeAreaView>
@@ -48,7 +52,6 @@ export const HomeScreen = ({ route, navigation }) => {
         <Text>"woop WOOP Woop"</Text>
       )
     }
-
 }
 
 const styles = StyleSheet.create({
@@ -67,6 +70,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     textAlign: 'center',
     color: 'white',
+    marginBottom: 10,
   },
 })
 

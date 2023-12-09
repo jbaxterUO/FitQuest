@@ -29,15 +29,16 @@ function App() {
         options={{title: "FitQuest", headerLeft: () => null,  headerStyle: {backgroundColor: '#1F2740'}, headerTintColor: '#E7EBE3', headerTitleStyle: {fontSize: 32, fontWeight: 'bold'}}}
         />
 
+        <RootStack.Screen
+        name="NutritionDetails"
+        component={NutritionDetails}
+        options={{title: "FitQuest", headerStyle: {backgroundColor: '#1F2740'}, headerTintColor: '#E7EBE3', headerTitleStyle: {fontSize: 32, fontWeight: 'bold'}, headerBackTitle: 'Back'}}
+        />
+
         <RootStack.Screen 
         name="CentralStack" 
         component={CentralStack} 
         options={{headerShown: false, headerLeft: () => null,}}
-        />
-
-        <RootStack.Screen
-        name="NutritionDetails"
-        component={NutritionDetails}
         />
 
       </RootStack.Navigator>

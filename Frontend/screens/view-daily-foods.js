@@ -28,7 +28,7 @@ export const ViewDailyFoods = ({ navigation }) => {
     } catch (e) {
       console.error(e);
   }}
-
+  
 
   const incrementDate = () => {
     const newDate = new Date(currentDate);
@@ -79,7 +79,7 @@ export const ViewDailyFoods = ({ navigation }) => {
           <Text style={styles.button}>Next</Text>
         </TouchableOpacity>
       </View>
-      {dailyFood && (<FoodList foodItems={dailyFood[dateIndex]}/>)}
+      {dailyFood && (<FoodList foodItems={dailyFood[dateIndex]} navigation={navigation}/>)}
       
       <Button title="Add Food" onPress={handleAddFood} />
     </SafeAreaView>

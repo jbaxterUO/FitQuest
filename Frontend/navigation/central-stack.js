@@ -6,7 +6,7 @@ import { Octicons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import LogOutButton from '../components/logout-button';
 import AddFood from '../screens/add-food';
-import AddFoodBackButton from '../components/add-food-back-button';
+import NutritionDetials from '../screens/nutrition-details';
 
 const Tab = createBottomTabNavigator()
 
@@ -42,7 +42,7 @@ export const CentralStack = () => {
         headerTitleStyle: {fontSize: 32, fontWeight: 'bold', fontFamily: 'Menlo'}}}
       />
 
-<Tab.Screen
+    <Tab.Screen
       name="AddFood"
       component={AddFood}
       options={{
@@ -53,8 +53,6 @@ export const CentralStack = () => {
         headerStyle: {backgroundColor: '#33415c',}, 
         headerTintColor: '#E7EBE3', 
         headerTitleStyle: {fontSize: 32, fontWeight: 'bold', fontFamily: 'Menlo'}}}
-        //make the header have a back button
-        headerLeft={({ navigation }) => <AddFoodBackButton navigation={navigation} />}
       />
     </Tab.Navigator>
   );

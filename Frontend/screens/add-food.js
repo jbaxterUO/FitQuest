@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Button, ScrollView } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import NutritionDetails from './nutrition-details';
 import { SearchBar } from 'react-native-elements';
 import { TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import FoodList from './../components/food-list';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 
-const AddFood = () => {
+export const AddFood = ({ navigation }) => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
@@ -22,7 +23,7 @@ const AddFood = () => {
     };
 
     getBarCodeScannerPermissions();
-  }, []);
+  }, [foodInfo]);
 
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
@@ -32,7 +33,7 @@ const AddFood = () => {
 
   const fetchItemByBarcode = async (barcode) => {
     try {
-      let response = await fetch(`http://192.168.1.9:5000/api/getbarcode/${barcode}`);
+      let response = await fetch(`http://192.168.1.9:5000/api/getbarcode/${barcode}`); 
       const json = await response.json();
       setfoodInfo(json);
       return json;
@@ -60,6 +61,11 @@ const AddFood = () => {
     return <Text>No access to camera</Text>;
   }
 
+  const clearSearch = () => {
+    setSearchText('');
+    setfoodInfo(null);
+  }
+
   return (
     <View style={styles.container}>
       {scannerOpen && !scanned ? (
@@ -76,6 +82,7 @@ const AddFood = () => {
                 onChangeText={(text) => setSearchText(text)}
                 value={searchText}
                 onSubmitEditing={() => fetchItemByTitle(searchText)}
+                onClear={() => {clearSearch()}}
               />
             </View>
 
@@ -90,12 +97,15 @@ const AddFood = () => {
                 <Ionicons name="barcode" size={64} color="white"/>
               </TouchableOpacity>
             </View>
-
+ 
           </View>
 
-          <ScrollView style={styles.scrollContainer}>
-            {foodInfo && <NutritionDetails data={foodInfo}/>}
-          </ScrollView>
+          <View style={{flex: 1}}>
+            {foodInfo && (
+              <FoodList foodItems={foodInfo} navigation={navigation} />
+            )}
+          </View>
+          
         </>
       )}
     </View>

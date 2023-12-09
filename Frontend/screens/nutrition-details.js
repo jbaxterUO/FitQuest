@@ -1,16 +1,17 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import useFoodStore from '../stores/food-entries-store';
 import { useState } from 'react';
-import { Button } from 'react-native-elements';
+import useFoodStore from '../stores/food-entries-store';
 
-export const NutritionDetails = ({ data }) => {
-  const [food, setFood] = useState(data);
-  const { dailyFood, setDailyFoodItems, removeDailyFooditems } = useFoodStore();
+export const NutritionDetails = ({ route }) => {
+  const [food, setFood] = useState({name: '', nutrients: {}, ingredients: ''});
+  const { dailyFoodItems, setDailyFoodItems } = useFoodStore();
+  let nutrientInfo = {}
 
   useEffect(() => {
-    setFood(data);
-  }, [data]);
+    nutrientInfo = route.params.nutrientInfo;
+    setFood(nutrientInfo);
+  }, [route.params]);
 
   const handleReject = () => {
     setFood(null);
@@ -18,35 +19,28 @@ export const NutritionDetails = ({ data }) => {
 
   const handleConfirm = () => {
     setDailyFoodItems(food);
-    print(dailyFood);
     setFood(null);
   }
 
   const renderNutrients = () => {
-    if (!food || !food.nutriments) {
+    if (!food || !food.nutrients) {
       return null;
     }
-
-    const nutrients = food.nutriments;
-
-    return Object.keys(nutrients).map((nutrient, index) => (
+    return Object.keys(food.nutrients).map((nutrient, index) => (
+      nutrient.includes('unit') ? null :
       <View key={index} style={styles.nutrientContainer}>
         <Text style={styles.nutrientName}>{nutrient}</Text>
-        <Text style={styles.nutrientValue}>{nutrients[nutrient] || 0} {nutrients[`${nutrient}_unit`]}</Text>
+        <Text style={styles.nutrientValue}>{food.nutrients[nutrient] || 0} {food.nutrients[`${nutrient}_unit`] || "g"}</Text>
       </View>
     ));
   };
 
-  if (!food) {
-    return null;
-  }
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{food.product_name_en}</Text>
+      <Text style={styles.title}>{food.name}</Text>
       {renderNutrients()}
       <Text style={styles.ingredientsTitle}>Ingredients:</Text>
-      <Text style={styles.ingredients}>{food.ingredients_text_en}</Text>
+      <Text style={styles.ingredients}>{food.ingredients}</Text>
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
           <Text style={styles.buttonText}>Reject</Text>
@@ -63,6 +57,7 @@ export default NutritionDetails;
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     padding: 16,
     backgroundColor: '#1f1d1c',
   },
@@ -109,7 +104,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   confirmButton: {
-    backgroundColor: '#F5E6CA',
+    backgroundColor: '#C1E1C1',
     padding: 10,
     borderRadius: 5,
   },

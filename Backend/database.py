@@ -4,15 +4,48 @@ import random
 from decouple import config
 from pymongo import MongoClient
 import json
+import requests
 
 
-def nutrient_prep_constructor(raw_nutrient_info: dict) -> dict:
-    desired_keys = ["carbohydrates_100g", "protien_100g", "fat_100g", "sodium_100g", "carbohydrates_unit", "fat_unit", "sodium_unit"]
+def mongo_nutrient_prep_constructor(raw_nutrient_info: dict) -> dict:
+    key_map = {"carbohydrates_100g": "carbohydrates", "protien_100g": "protien", "fat_100g": "fat", "sodium_100g": "sodium", "carbohydrates_unit": "carbohydrates_unit", "fat_unit":"fat_unit", "sodium_unit": "sodium_unit", "protien_unit": "protien_unit"}
     response = {}
     for key in raw_nutrient_info:
-        if key in desired_keys:
-            response[key] =  raw_nutrient_info[key]
+        if key in key_map.keys():
+            response[key_map[key]] = raw_nutrient_info[key]
     
+    return response
+
+def mongo_response_constructor(raw_mongo_response: dict) -> list:
+    response = {}
+    print(raw_mongo_response)
+    response["name"] = raw_mongo_response["product_name_en"]
+    if raw_mongo_response.get("ingredients_text_en") is not None:
+        response['ingredients'] = raw_mongo_response["ingredients_text_en"] 
+    else: response['ingredients'] = "No ingredients found"
+    response["nutrients"] = mongo_nutrient_prep_constructor(raw_mongo_response["nutriments"])
+    return [response]
+
+def api_nutrient_prep_constructor(raw_nutrient_info: list) -> dict:
+    response = {}
+    key_map = {'Carbohydrate, by difference': 'carbohydrates', 'Protein': 'protien' ,'Total lipid (fat)' :'fat', 'Sodium, Na': 'sodium'}
+    for nutrient_dict in raw_nutrient_info:
+        if nutrient_dict['nutrientName'] in key_map.keys():
+            response[key_map[nutrient_dict['nutrientName']]] = nutrient_dict['value']
+            response[key_map[nutrient_dict['nutrientName']] + "_unit"] = nutrient_dict['unitName']
+    return response
+
+def api_response_constructor(raw_api_response: dict) -> list:
+    search_results = raw_api_response["foods"]
+    response = [{} for _ in range(20)]
+    for i in range(20):
+        response[i]["id"] = search_results[i]["fdcId"]
+        response[i]["name"] = search_results[i]["description"]
+        response[i]["nutrients"] = api_nutrient_prep_constructor(search_results[i]["foodNutrients"])
+        if len(search_results[i]['foodMeasures']) > 0:
+            response[i]["servingAmount"] = search_results[i]['foodMeasures'][0]["disseminationText"]
+        else:
+            response[i]["servingAmount"] = 1
     return response
 
 class DataBase:
@@ -134,9 +167,25 @@ class DataBase:
     def get_nutrion_from_barcode(self, barcode: str) -> dict:
         filter_criteria = {"_id": barcode}
         projection = {"_id": 0, "nutriments": 1, "ingredients_text_en": 1, "product_name_en": 1}
-        return self.mongodb.all.find_one(filter_criteria, projection)
+        query = self.mongodb.all.find_one(filter_criteria, projection)
+
+        if query is None:
+            return {"response": "false", "message": "No results found"}
+        else:
+            return mongo_response_constructor(query)
 
     def get_nutrition_from_name(self, name: str) -> dict:
-        filter_criteria = {"$text": {"$search": name}}
-        projection = {"_id": 0, "nutriments": 1, "ingredients_text_en": 1, "product_name_en": 1}
-        return self.mongodb.all.find_one(filter_criteria, projection)
+        url = "https://api.nal.usda.gov/fdc/v1/foods/search"
+        headers = {
+            "Content-Type": "application/json",
+            "X-Api-Key": "HV3ArUbRrawf6WYHbSIPevYgxOaPniAThmQpEJ9Q"
+        }
+        params = {
+            "query": name,
+            "page": 1
+        }
+        response = requests.get(url, headers=headers, params=params)
+        if len(response.json()["foods"]) == 0:
+            return {"response": "false", "message": "No results found"}
+        return api_response_constructor(response.json())
+

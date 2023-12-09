@@ -2,28 +2,32 @@ import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-const Food = ({ name, nutrition, servingAmount, servingType }) => {
-  const hasNutritionData = nutrition && Object.keys(nutrition).length > 0;
+const Food = ({ name, nutrients, servingAmount, servingType, ingredients, navigation }) => {
+  const hasNutrientsData = nutrients && Object.keys(nutrients).length > 0;
+  const foodInfo = {name: name, nutrients: nutrients, servingAmount: servingAmount, servingType: servingType, ingredients: ingredients};
   return(
-    <TouchableOpacity onPress={() => alert(`Clicked on: ${nutrition?.carbs || 'No Data'}`)}>
+    <TouchableOpacity onPress={() => {
+      navigation.navigate('NutritionDetails', {nutrientInfo: foodInfo});
+      }}>
+
       <View style={styles.foodContainer}>
         <View style={styles.foodTitleContainer}>
           <Text style={styles.foodTitle}>{name}</Text>
         </View>
         <View style={styles.foodBodyContainer}>
-          {hasNutritionData ? (
+          {hasNutrientsData ? (
             <View>
-              <Text style={styles.foodText}>Carbs: {nutrition.carbs}</Text>
-              <Text style={styles.foodText}>Protein: {nutrition.protien}</Text>
-              <Text style={styles.foodText}>Fat: {nutrition.fat}</Text>
+              <Text style={styles.foodText}>Carbs: {nutrients.carbohydrates}</Text>
+              <Text style={styles.foodText}>Protein: {nutrients.protein}</Text>
+              <Text style={styles.foodText}>Fat: {nutrients.fat}</Text>
             </View>
           ) : (
             <Text style={styles.foodText}>No Data</Text>
           )}
           <View>
-            {hasNutritionData && (
+            {hasNutrientsData && (
               <>
-                <Text style={styles.foodText}>Calories: {nutrition.calories}</Text>
+                <Text style={styles.foodText}>Calories: {nutrients.calories}</Text>
                 <Text style={styles.foodText}>{servingType}: {servingAmount}</Text>
               </>
             )}
@@ -36,23 +40,25 @@ const Food = ({ name, nutrition, servingAmount, servingType }) => {
 
 const styles = StyleSheet.create({
   foodContainer: {
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     backgroundColor: '#1f1d1c',
+    marginVertical: 5,
+    borderRadius: 5,
+    borderColor: 'rgba(128, 128, 128, 0.5)',
+    borderWidth: 1,
+    marginBottom: 1,
   },
   foodTitleContainer: {
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 2,
   },
   foodBodyContainer: {
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  foodTitle:
-  {
+  foodTitle: {
     color: 'white',
     fontFamily: 'Menlo',
     fontWeight: 'bold',
@@ -61,8 +67,10 @@ const styles = StyleSheet.create({
   },
   foodText: {
     color: 'white',
-    fontFamily: 'Menlo'
-  }
+    fontFamily: 'Menlo',
+    fontSize: 14,
+    marginTop: 5,
+  },
 });
 
 export default Food;

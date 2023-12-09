@@ -4,7 +4,10 @@ import { View, StyleSheet, FlatList } from 'react-native';
 import Food from './food-item';
 
 
-const FoodList = ({ foodItems }) => {
+const FoodList = ({ foodItems, navigation }) => {
+
+  useEffect(() => {
+  }, [foodItems]);
 
   if(foodItems){
   return (
@@ -13,7 +16,7 @@ const FoodList = ({ foodItems }) => {
       <FlatList
         data={foodItems}
         keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) => <Food {...item}/>}
+        renderItem={({ item, index }) => <Food {...item} navigation={navigation}/>}
         style={styles.flatList}
       />
     </View>
